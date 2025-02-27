@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>うさ王様とじゃんけん！</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        h1 {
+            color: #005f99;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .game-rules {
+            color: #005f99;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .usao-hand {
+            font-size: 60px; /* うさ王様の出した手を大きめに表示 */
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .usao-icon {
+            width: 128px;
+            height: 128px;
+            margin: 10px auto;
+        }
+
+        .counter {
+            font-size: 18px;
+            margin-top: 10px;
+            color: black;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="start-button" onclick="startGame()">🎵 ゲーム開始！BGMを流す</button>
+
+    <div class="game-container">
+        <h1>うさ王様とじゃんけん！</h1>
+        <p class="game-rules"><strong>10回先取した方が勝ち！</strong></p>
+        <span id="usao-hand" class="usao-hand">✊</span> <!-- うさ王様の出した手（大きめ） -->
+        <img id="usao-icon" class="usao-icon" src="usao_tie.png">
+        <div class="counter">
+            勝ち: <span id="win-count">0</span> / 10　負け: <span id="lose-count">0</span> / 10
+        </div>
+        <div class="choices">
+            <button onclick="playGame('グー')">👊 グー</button>
+            <button onclick="playGame('チョキ')">✌️ チョキ</button>
+            <button onclick="playGame('パー')">✋ パー</button>
+        </div>
+        <div class="result" id="result">結果がここに表示される</div>
+        <div class="usao-comment" id="usao-comment">うさ王様のコメント</div>
+    </div>
+
+    <div id="popup" class="popup">
+        <h2 id="popup-title"></h2>
+        <img id="popup-image" src="">
+        <button onclick="resetGame()">もう一度！</button>
+    </div>
+
+    <audio id="bgm" src="usao_janken_bgm.mp3" loop></audio>
+    <audio id="win-sound" src="usao_win_se.mp3"></audio>
+    <audio id="lose-sound" src="usao_lose_se.mp3"></audio>
+    <audio id="tie-sound" src="usao_tie_se.mp3"></audio>
+
+    <script>
+        let winCount = 0;
+        let loseCount = 0;
+
+        function startGame() {
+            let bgm = document.getElementById("bgm");
+            bgm.volume = 0.5;
+            bgm.play().catch(() => console.log("BGMの自動再生がブロックされた"));
+        }
+
+        function playGame(playerChoice) {
+    const choices = ['グー', 'チョキ', 'パー'];
+    const choiceEmojis = { 'グー': '👊', 'チョキ': '✌️', 'パー': '✋' };
+    const usaoChoice = choices[Math.floor(Math.random() * choices.length)];
+
+    let resultText = '';
+    let usaoComment = '';
+    let usaoIcon = 'usao_tie.png';
+
+    document.getElementById('usao-hand').textContent = choiceEmojis[usaoChoice]; // うさ王様の出した手を表示
+
+    if (playerChoice === usaoChoice) {
+        resultText = `引き分け！ うさ王様も ${usaoChoice} ${choiceEmojis[usaoChoice]} だった！`;
+        usaoComment = "お？俺と同じ手を出すなんて…やるじゃねぇか！";
+        usaoIcon = 'usao_tie.png';
+        document.getElementById('tie-sound').play();
+    } else if (
+        (playerChoice === 'グー' && usaoChoice === 'チョキ') ||
+        (playerChoice === 'チョキ' && usaoChoice === 'パー') ||
+        (playerChoice === 'パー' && usaoChoice === 'グー')
+    ) {
+        resultText = `勝った！ うさ王様は ${usaoChoice} ${choiceEmojis[usaoChoice]} だった！`;
+        usaoComment = "ぐっ…な、なんで俺が負けるんだ！？ズルくない？";
+        usaoIcon = 'usao_lose.png';
+        winCount++;
+        document.getElementById('win-sound').play();
+    } else {
+        resultText = `負けた！ うさ王様は ${usaoChoice} ${choiceEmojis[usaoChoice]} だった！`;
+        usaoComment = "ははっ！俺の勝ちだな？まぁまぁ、泣くなって！";
+        usaoIcon = 'usao_win.png';
+        loseCount++;
+        document.getElementById('lose-sound').play();
+    }
+
+    document.getElementById('result').textContent = resultText;
+    document.getElementById('usao-comment').textContent = usaoComment;
+    document.getElementById('usao-icon').src = usaoIcon;
+    document.getElementById('win-count').textContent = winCount;
+    document.getElementById('lose-count').textContent = loseCount;
+
+    if (winCount >= 10) {
+        let victoryImages = ["usao_victory.png", "usao_victory2.png"];
+        let randomVictory = victoryImages[Math.floor(Math.random() * victoryImages.length)];
+        showPopup("🎉 キミの勝ち！景品は俺だ！", randomVictory, "red");  // 🔥 赤字
+    } else if (loseCount >= 10) {
+        showPopup("🐰 俺の勝ちだな！ようこそ、白うさへ", "usao_doyagao.png", "blue");  // 💙 青字
+    }
+}
+
+        function showPopup(title, imageSrc, color) {
+    let popupTitle = document.getElementById('popup-title');
+    popupTitle.textContent = title;
+    popupTitle.style.color = color;  // 勝ち → 赤、負け → 青
+    document.getElementById('popup-image').src = imageSrc;
+    document.getElementById('popup').style.display = 'block';
+}
+
+        function resetGame() {
+            winCount = 0;
+            loseCount = 0;
+            document.getElementById('win-count').textContent = winCount;
+            document.getElementById('lose-count').textContent = loseCount;
+            document.getElementById('popup').style.display = 'none';
+        }
+    </script>
+
+</body>
+</html>

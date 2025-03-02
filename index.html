@@ -126,28 +126,36 @@
 
     document.getElementById('usao-hand').textContent = choiceEmojis[usaoChoice]; // うさ王様の出した手を表示
 
-    if (playerChoice === usaoChoice) {
-        resultText = `引き分け！ うさ王様も ${usaoChoice} ${choiceEmojis[usaoChoice]} だった！`;
-        usaoComment = "お？俺と同じ手を出すなんて…やるじゃねぇか！";
-        usaoIcon = 'usao_tie.png';
-        document.getElementById('tie-sound').play();
-    } else if (
-        (playerChoice === 'グー' && usaoChoice === 'チョキ') ||
-        (playerChoice === 'チョキ' && usaoChoice === 'パー') ||
-        (playerChoice === 'パー' && usaoChoice === 'グー')
-    ) {
-        resultText = `勝った！ うさ王様は ${usaoChoice} ${choiceEmojis[usaoChoice]} だった！`;
-        usaoComment = "ぐっ…な、なんで俺が負けるんだ！？ズルくない？";
-        usaoIcon = 'usao_lose.png';
-        winCount++;
-        document.getElementById('win-sound').play();
-    } else {
-        resultText = `負けた！ うさ王様は ${usaoChoice} ${choiceEmojis[usaoChoice]} だった！`;
-        usaoComment = "ははっ！俺の勝ちだな？まぁまぁ、泣くなって！";
-        usaoIcon = 'usao_win.png';
-        loseCount++;
-        document.getElementById('lose-sound').play();
-    }
+if (playerChoice === usaoChoice) {
+    resultText = `引き分け！ うさ王様も ${usaoChoice} ${choiceEmojis[usaoChoice]} だった！`;
+    usaoComment = "お？俺と同じ手を出すなんて…やるじゃねぇか！";
+    usaoIcon = 'usao_tie.png';
+    document.getElementById('tie-sound').play();
+    document.getElementById('usao-comment').style.color = "gray"; // 引き分けはグレー
+} else if (
+    (playerChoice === 'グー' && usaoChoice === 'チョキ') ||
+    (playerChoice === 'チョキ' && usaoChoice === 'パー') ||
+    (playerChoice === 'パー' && usaoChoice === 'グー')
+) {
+    resultText = `勝った！ うさ王様は ${usaoChoice} ${choiceEmojis[usaoChoice]} だった！`;
+    usaoComment = "ぐっ…な、なんで俺が負けるんだ！？ズルくない？";
+    usaoIcon = 'usao_lose.png';
+    winCount++;
+    document.getElementById('win-sound').play();
+    document.getElementById('usao-comment').style.color = "red"; // 勝ったら赤
+} else {
+    resultText = `負けた！ うさ王様は ${usaoChoice} ${choiceEmojis[usaoChoice]} だった！`;
+    usaoComment = "ははっ！俺の勝ちだな？まぁまぁ、泣くなって！";
+    usaoIcon = 'usao_win.png';
+    loseCount++;
+    document.getElementById('lose-sound').play();
+    document.getElementById('usao-comment').style.color = "blue"; // 負けたら青
+}
+
+// どの結果でも「アナウンス（result）」の文字はグレーにする
+document.getElementById('result').style.color = "gray";
+
+
 
     document.getElementById('result').textContent = resultText;
     document.getElementById('usao-comment').textContent = usaoComment;
